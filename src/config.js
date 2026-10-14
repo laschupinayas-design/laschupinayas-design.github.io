@@ -20,6 +20,10 @@ export const grupo = {
     clabe: '072320013653536930',
   },
 
+  // Imagen para la sección "Quiénes somos". Guarda tu archivo en public/ y pon su nombre aquí.
+  quienesFoto: `${import.meta.env.BASE_URL}quienes_somos.jpeg`,
+  quienesFotoDerecha: false,
+
   eventosPrivados: {
     texto:
       'Organizamos una salida solo para tu grupo: amigos, familia o equipo de trabajo. Elegimos contigo la ruta, el nivel y el horario.',

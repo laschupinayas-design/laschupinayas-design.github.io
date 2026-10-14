@@ -34,12 +34,18 @@ const BASE = import.meta.env.BASE_URL;
 
 function Foto() {
   // Si todavía no existe la foto, se ve un paisaje ilustrado.
-  const [hay, setHay] = useState(true);
+  const [hay, setHay] = useState(Boolean(grupo.quienesFoto));
+  const src = grupo.quienesFoto || `${BASE}quienes-somos.jpg`;
+
   return (
     <div className="qs-foto">
       <Paisaje className="qs-foto-paisaje" />
       {hay && (
-        <img src={`${BASE}quienes-somos.jpg`} alt="Fotografía del grupo" onError={() => setHay(false)} />
+        <img
+          src={src}
+          alt="Fotografía del grupo"
+          onError={() => setHay(false)}
+        />
       )}
     </div>
   );

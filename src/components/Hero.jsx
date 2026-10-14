@@ -67,19 +67,21 @@ function Botanico({ className }) {
 }
 
 export default function Hero() {
-  // Pon tu foto en public/hero.jpeg. Si no existe, se muestra un paisaje ilustrado.
+  // Pon tu foto en public/hero.jpg. Si no existe, se muestra un paisaje ilustrado.
+  // Para celular pon otra foto en public/hero-mobile.jpg. Si no existe, se usa hero.jpg.
   const [foto, setFoto] = useState(true);
+  const [movil, setMovil] = useState(true);
+  const base = import.meta.env.BASE_URL;
+  const alFallar = () => (movil ? setMovil(false) : setFoto(false));
 
   return (
     <section id="inicio" className="hero">
       <Paisaje className="hero-ridges" />
       {foto && (
-        <img
-          className="hero-img"
-          src={`${import.meta.env.BASE_URL}hero.jpeg`}
-          alt=""
-          onError={() => setFoto(false)}
-        />
+        <picture>
+          {movil && <source media="(max-width: 700px)" srcSet={`${base}hero_2.jpeg`} />}
+          <img className="hero-img" src={`${base}hero.png`} alt="" onError={alFallar} />
+        </picture>
       )}
       <div className="hero-shade" aria-hidden="true" />
       <Botanico className="hero-bot hero-bot-izq" />
