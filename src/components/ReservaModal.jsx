@@ -1,61 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import { grupo } from '../config';
-import { crearReserva } from '../lib/eventos';
+import { supabase } from '../supabase/supabaseClient';
 import { fechaLarga, hora, precioTexto } from '../lib/formato';
-import ImagenEvento from './ImagenEvento';
 import './ReservaModal.css';
 
-const PAISES = [
-  ['+52', 'MX +52'],
-  ['+1', 'US +1'],
-  ['+34', 'ES +34'],
-  ['+57', 'CO +57'],
-  ['+54', 'AR +54'],
-  ['+56', 'CL +56'],
-  ['+51', 'PE +51'],
-];
-
-const VACIO = {
-  lugares: 1,
-  nombre: '',
-  email: '',
-  paisTel: '+52',
-  tel: '',
-  nacimiento: '',
-  salud: '',
-  emNombre: '',
-  emRelacion: '',
-  emPais: '+52',
-  emTel: '',
-  carta: false,
-  website: '', // campo trampa para bots
+const INICIAL = {
+  full_name: '', email: '', phone_country: '+52', phone: '', birth_date: '', medical_notes: '',
+  emergency_name: '', emergency_relationship: '', emergency_phone_country: '+52', emergency_phone: '',
+  waiver: false, website: '',
 };
 
-const soloDigitos = (t) => t.replace(/\D/g, '');
-const telValido = (pais, t) => {
-  const n = soloDigitos(t).length;
-  return pais === '+52' ? n === 10 : n >= 7 && n <= 15;
-};
-const msgTel = (pais) =>
-  pais === '+52' ? 'Escribe los 10 dígitos del celular.' : 'Escribe un número válido (de 7 a 15 dígitos).';
+const soloDigitos = (v) => v.replace(/\D/g, '');
 
 function validar(v) {
   const e = {};
-  if (v.nombre.trim().length < 2) e.nombre = 'Escribe tu nombre completo.';
-  if (!/^\S+@\S+\.\S+$/.test(v.email.trim())) e.email = 'Escribe un correo válido, por ejemplo nombre@correo.com.';
-  if (!telValido(v.paisTel, v.tel)) e.tel = msgTel(v.paisTel);
-  if (!v.nacimiento) {
-    e.nacimiento = 'Indica tu fecha de nacimiento.';
-  } else {
-    const d = new Date(`${v.nacimiento}T00:00:00`);
-    if (Number.isNaN(d.getTime()) || d > new Date() || d.getFullYear() < 1900) {
-      e.nacimiento = 'Revisa tu fecha de nacimiento.';
-    }
-  }
-  if (v.emNombre.trim().length < 2) e.emNombre = 'Escribe el nombre de tu contacto de emergencia.';
-  if (v.emRelacion.trim().length < 2) e.emRelacion = 'Indica qué relación tienes con esa persona.';
-  if (!telValido(v.emPais, v.emTel)) e.emTel = msgTel(v.emPais);
-  if (!v.carta) e.carta = 'Debes aceptar la carta de responsabilidad para reservar.';
+  if (v.full_name.trim().length < 2) e.full_name = 'Escribe tu nombre completo.';
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email.trim())) e.email = 'Escribe un correo válido, por ejemplo nombre@correo.com.';
+  if (!/^\+[0-9]{1,3}$/.test(v.phone_country)) e.phone_country = 'Lada inválida (ej. +52).';
+  if (!/^[0-9]{7,15}$/.test(v.phone)) e.phone = 'Escribe tu teléfono, solo números (7 a 15 dígitos).';
+  if (!v.birth_date) e.birth_date = 'Indica tu fecha de nacimiento.';
+  else if (new Date(v.birth_date) > new Date()) e.birth_date = 'La fecha no puede ser futura.';
+  if (v.emergency_name.trim().length < 2) e.emergency_name = 'Escribe el nombre de tu contacto de emergencia.';
+  if (v.emergency_relationship.trim().length < 2) e.emergency_relationship = 'Indica el parentesco (ej. mamá, pareja, amiga).';
+  if (!/^[0-9]{7,15}$/.test(v.emergency_phone)) e.emergency_phone = 'Escribe su teléfono, solo números (7 a 15 dígitos).';
+  if (!v.waiver) e.waiver = 'Debes aceptar la carta de responsabilidad.';
   return e;
 }
 
@@ -64,249 +31,179 @@ function Campo({ id, label, error, children }) {
     <div className="campo">
       <label htmlFor={id}>{label}</label>
       {children}
-      {error && <p id={`${id}-error`} className="campo-error">{error}</p>}
+      {error && <p id={`err-${id}`} className="campo-error">{error}</p>}
     </div>
   );
 }
 
-function Telefono({ id, label, pais, tel, error, nombrePais, nombreTel, onChange }) {
-  return (
-    <Campo id={id} label={label} error={error}>
-      <div className="telefono">
-        <select aria-label="Código de país" name={nombrePais} value={pais} onChange={onChange}>
-          {PAISES.map(([cod, texto]) => (
-            <option key={cod} value={cod}>{texto}</option>
-          ))}
-        </select>
-        <input
-          id={id}
-          name={nombreTel}
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel-national"
-          placeholder="Ej. 10 dígitos"
-          value={tel}
-          onChange={onChange}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
-        />
-      </div>
-    </Campo>
-  );
-}
-
 export default function ReservaModal({ evento, onCerrar, onListo }) {
-  const ref = useRef(null);
-  const [v, setV] = useState(VACIO);
+  const dialogo = useRef(null);
+  const [v, setV] = useState(INICIAL);
+  const [lugares, setLugares] = useState(1);
   const [errores, setErrores] = useState({});
-  const [enviando, setEnviando] = useState(false);
-  const [errorEnvio, setErrorEnvio] = useState('');
+  const [estado, setEstado] = useState('idle'); // idle | enviando
+  const [fallo, setFallo] = useState('');
+
+  const maximo = Math.max(1, Math.min(10, evento.spots_left));
+  const total = Number(evento.price_mxn) * lugares;
 
   useEffect(() => {
-    const d = ref.current;
+    const d = dialogo.current;
     if (d && !d.open) d.showModal();
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, []);
-
-  const maxLugares = Math.max(1, Math.min(10, evento.spots_left));
-  const total = evento.price_mxn * v.lugares;
-  const hoyISO = new Date().toLocaleDateString('en-CA');
 
   const cambiar = (e) => {
     const { name, value, type, checked } = e.target;
-    setV((a) => ({ ...a, [name]: type === 'checkbox' ? checked : value }));
+    setV((x) => ({ ...x, [name]: type === 'checkbox' ? checked : value }));
   };
-  const cambiarLugares = (delta) =>
-    setV((a) => ({ ...a, lugares: Math.min(maxLugares, Math.max(1, a.lugares + delta)) }));
-
-  const cerrar = () => ref.current?.close();
-  const clickFuera = (e) => {
-    if (e.target === ref.current) cerrar();
+  const cambiarTel = (e) => setV((x) => ({ ...x, [e.target.name]: soloDigitos(e.target.value) }));
+  const cambiarLada = (e) => {
+    const limpio = '+' + soloDigitos(e.target.value).slice(0, 3);
+    setV((x) => ({ ...x, [e.target.name]: limpio }));
   };
 
   const enviar = async (ev) => {
     ev.preventDefault();
-    if (v.website) return; // un bot llenó el campo trampa
+    setFallo('');
+    if (v.website) { onCerrar(); return; } // campo trampa para bots
 
-    const errs = validar(v);
-    setErrores(errs);
-    if (Object.keys(errs).length > 0) {
-      requestAnimationFrame(() => ref.current?.querySelector('[aria-invalid="true"]')?.focus());
+    const found = validar(v);
+    setErrores(found);
+    if (Object.keys(found).length > 0) {
+      document.getElementById(Object.keys(found)[0])?.focus();
+      return;
+    }
+    if (!supabase) {
+      setFallo('Modo demostración: esta reserva no se guardó porque Supabase no está configurado.');
       return;
     }
 
-    setEnviando(true);
-    setErrorEnvio('');
+    setEstado('enviando');
     const id = crypto.randomUUID();
-    try {
-      const res = await crearReserva({
-        id,
-        event_id: evento.id,
-        spots: v.lugares,
-        full_name: v.nombre.trim(),
-        email: v.email.trim().toLowerCase(),
-        phone_country: v.paisTel,
-        phone: soloDigitos(v.tel),
-        birth_date: v.nacimiento,
-        medical_notes: v.salud.trim() || null,
-        emergency_name: v.emNombre.trim(),
-        emergency_relationship: v.emRelacion.trim(),
-        emergency_phone_country: v.emPais,
-        emergency_phone: soloDigitos(v.emTel),
-        waiver_accepted: true,
-      });
-      onListo({
-        id,
-        lugares: v.lugares,
-        total,
-        nombre: v.nombre.trim(),
-        email: v.email.trim().toLowerCase(),
-        demo: res.demo,
-      });
-    } catch (err) {
-      setErrorEnvio(err.message);
-      setEnviando(false);
+    const { error } = await supabase.from('reservations').insert({
+      id,
+      event_id: evento.id,
+      spots: lugares,
+      full_name: v.full_name.trim(),
+      email: v.email.trim().toLowerCase(),
+      phone_country: v.phone_country,
+      phone: v.phone,
+      birth_date: v.birth_date,
+      medical_notes: v.medical_notes.trim() || null,
+      emergency_name: v.emergency_name.trim(),
+      emergency_relationship: v.emergency_relationship.trim(),
+      emergency_phone_country: v.emergency_phone_country,
+      emergency_phone: v.emergency_phone,
+      waiver_accepted: true,
+    });
+
+    if (error) {
+      console.error(error);
+      setEstado('idle');
+      if (error.code === '23505') setFallo('Ya existe una reserva con este correo para este evento.');
+      else if (/lugares suficientes/i.test(error.message)) setFallo(error.message);
+      else setFallo('No se pudo guardar tu reserva. Revisa tu conexión e inténtalo de nuevo.');
+      return;
     }
+    onListo({ id, spots: lugares, total, full_name: v.full_name.trim(), email: v.email.trim().toLowerCase() });
   };
 
-  const campoProps = (nombre) => ({
-    name: nombre,
-    value: v[nombre],
-    onChange: cambiar,
-    'aria-invalid': !!errores[nombre],
-    'aria-describedby': errores[nombre] ? `${nombre}-error` : undefined,
-  });
+  const ariaError = (k) => ({ 'aria-invalid': !!errores[k], 'aria-describedby': errores[k] ? `err-${k}` : undefined });
 
   return (
-    <dialog
-      ref={ref}
-      className="modal"
-      aria-labelledby="modal-titulo"
-      onClose={onCerrar}
-      onClick={clickFuera}
-    >
-      <ImagenEvento src={evento.image_url} className="modal-img" />
-
-      <div className="modal-panel">
-        <header className="modal-head">
+    <dialog ref={dialogo} className="modal" aria-labelledby="modal-titulo" onClose={onCerrar} onCancel={onCerrar}>
+      <form className="modal-panel" onSubmit={enviar} noValidate>
+        <div className="modal-head">
           <div>
             <h2 id="modal-titulo">Apartar evento</h2>
-            <p>Completa tus datos para conseguir tu boleto.</p>
+            <p>Llena tus datos para reservar tu lugar.</p>
           </div>
-          <button type="button" className="modal-cerrar" aria-label="Cerrar" onClick={cerrar}>
-            ×
-          </button>
-        </header>
+          <button type="button" className="modal-cerrar" onClick={onCerrar} aria-label="Cerrar">×</button>
+        </div>
 
-        <form className="modal-body" onSubmit={enviar} noValidate>
+        <div className="modal-body">
           <p className="modal-evento">
-            <strong>{evento.title}</strong>
-            <br />
+            <strong>{evento.title}</strong><br />
             {fechaLarga(evento.starts_at)}, {hora(evento.starts_at)} h
           </p>
 
           <div className="lugares">
-            <div>
-              <strong>Lugares</strong>
-              <p>¿Cuántos vas a apartar?</p>
-            </div>
+            <p>¿Cuántos lugares?<br />Máximo {maximo} por reserva.</p>
             <div className="stepper">
-              <button type="button" aria-label="Quitar un lugar" onClick={() => cambiarLugares(-1)} disabled={v.lugares <= 1}>
-                −
-              </button>
-              <output aria-live="polite">{v.lugares}</output>
-              <button type="button" aria-label="Agregar un lugar" onClick={() => cambiarLugares(1)} disabled={v.lugares >= maxLugares}>
-                +
-              </button>
+              <button type="button" onClick={() => setLugares((n) => Math.max(1, n - 1))} disabled={lugares <= 1} aria-label="Quitar un lugar">−</button>
+              <output aria-live="polite">{lugares}</output>
+              <button type="button" onClick={() => setLugares((n) => Math.min(maximo, n + 1))} disabled={lugares >= maximo} aria-label="Agregar un lugar">+</button>
             </div>
           </div>
 
           <fieldset>
             <legend>Datos personales</legend>
-            <Campo id="nombre" label="Nombre completo" error={errores.nombre}>
-              <input id="nombre" autoComplete="name" placeholder="Ej. Ana Torres" {...campoProps('nombre')} />
+            <Campo id="full_name" label="Nombre completo" error={errores.full_name}>
+              <input id="full_name" name="full_name" value={v.full_name} onChange={cambiar} autoComplete="name" {...ariaError('full_name')} />
             </Campo>
             <Campo id="email" label="Correo electrónico" error={errores.email}>
-              <input id="email" type="email" autoComplete="email" placeholder="ejemplo@correo.com" {...campoProps('email')} />
+              <input id="email" name="email" type="email" value={v.email} onChange={cambiar} autoComplete="email" {...ariaError('email')} />
             </Campo>
-            <Telefono
-              id="tel"
-              label="Número de celular"
-              pais={v.paisTel}
-              tel={v.tel}
-              error={errores.tel}
-              nombrePais="paisTel"
-              nombreTel="tel"
-              onChange={cambiar}
-            />
-            <Campo id="nacimiento" label="Fecha de nacimiento" error={errores.nacimiento}>
-              <input id="nacimiento" type="date" min="1900-01-01" max={hoyISO} autoComplete="bday" {...campoProps('nacimiento')} />
+            <Campo id="phone" label="Teléfono / WhatsApp" error={errores.phone || errores.phone_country}>
+              <div className="telefono">
+                <input id="phone_country" name="phone_country" value={v.phone_country} onChange={cambiarLada} inputMode="tel" aria-label="Lada" />
+                <input id="phone" name="phone" type="tel" inputMode="numeric" value={v.phone} onChange={cambiarTel} autoComplete="tel-national" {...ariaError('phone')} />
+              </div>
             </Campo>
-            <Campo id="salud" label="¿Existe alguna condición médica, alergia o situación que debamos conocer para tu seguridad? (opcional)">
-              <textarea id="salud" name="salud" rows="3" maxLength={1000} placeholder="Especificar" value={v.salud} onChange={cambiar} />
+            <Campo id="birth_date" label="Fecha de nacimiento" error={errores.birth_date}>
+              <input id="birth_date" name="birth_date" type="date" value={v.birth_date} onChange={cambiar} autoComplete="bday" {...ariaError('birth_date')} />
+            </Campo>
+            <Campo id="medical_notes" label="Alergias o condiciones médicas (opcional)">
+              <textarea id="medical_notes" name="medical_notes" rows="3" maxLength={1000} value={v.medical_notes} onChange={cambiar} />
             </Campo>
           </fieldset>
 
           <fieldset>
             <legend>Contacto de emergencia</legend>
-            <Campo id="emNombre" label="Nombre completo" error={errores.emNombre}>
-              <input id="emNombre" placeholder="Ej. Carlos López" {...campoProps('emNombre')} />
+            <Campo id="emergency_name" label="Nombre" error={errores.emergency_name}>
+              <input id="emergency_name" name="emergency_name" value={v.emergency_name} onChange={cambiar} {...ariaError('emergency_name')} />
             </Campo>
-            <Campo id="emRelacion" label="Relación con el contacto de emergencia" error={errores.emRelacion}>
-              <input id="emRelacion" placeholder="Ej. Hermano, pareja, amiga" {...campoProps('emRelacion')} />
+            <Campo id="emergency_relationship" label="Parentesco" error={errores.emergency_relationship}>
+              <input id="emergency_relationship" name="emergency_relationship" value={v.emergency_relationship} onChange={cambiar} {...ariaError('emergency_relationship')} />
             </Campo>
-            <Telefono
-              id="emTel"
-              label="Celular del contacto"
-              pais={v.emPais}
-              tel={v.emTel}
-              error={errores.emTel}
-              nombrePais="emPais"
-              nombreTel="emTel"
-              onChange={cambiar}
-            />
+            <Campo id="emergency_phone" label="Teléfono" error={errores.emergency_phone}>
+              <div className="telefono">
+                <input name="emergency_phone_country" value={v.emergency_phone_country} onChange={cambiarLada} inputMode="tel" aria-label="Lada del contacto" />
+                <input id="emergency_phone" name="emergency_phone" type="tel" inputMode="numeric" value={v.emergency_phone} onChange={cambiarTel} {...ariaError('emergency_phone')} />
+              </div>
+            </Campo>
           </fieldset>
 
+          <div className="carta">
+            <h3>Carta de responsabilidad</h3>
+            <p className="carta-aviso">
+              Entiendo que el senderismo implica riesgos, que participo voluntariamente y bajo mi propia responsabilidad,
+              y que debo seguir las indicaciones de las guías durante toda la actividad.
+            </p>
+            <label className="carta-check" htmlFor="waiver">
+              <input id="waiver" name="waiver" type="checkbox" checked={v.waiver} onChange={cambiar} {...ariaError('waiver')} />
+              <span>He leído y acepto la carta de responsabilidad.</span>
+            </label>
+            {errores.waiver && <p id="err-waiver" className="campo-error">{errores.waiver}</p>}
+          </div>
+
+          {/* Campo trampa anti-bots */}
           <div className="trampa" aria-hidden="true">
             <label htmlFor="website">No llenes este campo</label>
             <input id="website" name="website" tabIndex={-1} autoComplete="off" value={v.website} onChange={cambiar} />
           </div>
 
-          <div className="carta">
-            <h3>Carta de responsabilidad compartida</h3>
-            {grupo.cartaUrl ? (
-              <a href={grupo.cartaUrl} target="_blank" rel="noreferrer">Ver carta</a>
-            ) : (
-              import.meta.env.DEV && <p className="carta-aviso">Agrega tu carta en src/config.js (cartaUrl).</p>
-            )}
-            <label className="carta-check">
-              <input
-                type="checkbox"
-                name="carta"
-                checked={v.carta}
-                onChange={cambiar}
-                aria-invalid={!!errores.carta}
-              />
-              <span>He leído y acepto la carta de responsabilidad compartida.</span>
-            </label>
-            {errores.carta && <p className="campo-error">{errores.carta}</p>}
-          </div>
-
-          {errorEnvio && <p className="campo-error" role="alert">{errorEnvio}</p>}
-
-          <button type="submit" className="reg-btn" disabled={!v.carta || enviando}>
-            {enviando ? 'Enviando…' : 'Reservar lugar'}
+          {fallo && <p className="campo-error" role="alert">{fallo}</p>}
+          <button className="reg-btn" type="submit" disabled={estado === 'enviando'}>
+            {estado === 'enviando' ? 'Reservando…' : 'Reservar lugar'}
           </button>
-        </form>
+        </div>
 
-        <footer className="modal-foot">
-          <span>Total</span>
-          <strong>{precioTexto(total)}</strong>
-        </footer>
-      </div>
+        <div className="modal-foot">
+          <span>{lugares} {lugares === 1 ? 'lugar' : 'lugares'}</span>
+          <strong>{total > 0 ? precioTexto(total) : 'Gratis'}</strong>
+        </div>
+      </form>
     </dialog>
   );
 }
