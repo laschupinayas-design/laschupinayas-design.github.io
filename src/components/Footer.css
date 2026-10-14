@@ -1,0 +1,71 @@
+/* Pie de página: banner con paisaje, logo y frase, y las redes sociales encima */
+.pie { background: var(--crema); color: var(--verde); }
+
+.pie-banner { position: relative; line-height: 0; }
+.pie-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 19rem;        /* en celular se recorta a los lados para que la frase se lea */
+  object-fit: cover;
+  object-position: 50% 40%;
+}
+/* Mezcla suave con el crema de la sección de arriba */
+.pie-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 1;
+  height: clamp(2rem, 6vw, 5rem);
+  background: linear-gradient(to bottom, var(--crema) 0%, rgba(237, 228, 217, 0) 100%);
+  pointer-events: none;
+}
+
+/* Iconos de redes sociales: debajo de la frase, al centro */
+.pie-redes {
+  position: absolute;
+  left: 50%;
+  top: 68%;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateX(-50%);
+}
+.pie-red {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  color: #f3ece1;
+  line-height: 1;
+  background: var(--verde);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px rgba(214, 176, 129, 0.85), 0 6px 14px rgba(20, 12, 22, 0.35);
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+a.pie-red:hover { background: var(--ciruela-vivo); transform: translateY(-2px); }
+a.pie-red:focus-visible { outline: 3px solid var(--ciruela-vivo); outline-offset: 3px; }
+.pie-red-vacia { opacity: 0.6; }
+@media (prefers-reduced-motion: reduce) {
+  .pie-red { transition: none; }
+  a.pie-red:hover { transform: none; }
+}
+
+.pie-legal {
+  margin: 0;
+  padding: 0.95rem 1.25rem;
+  color: #d4c7b5;
+  font-size: 0.9rem;
+  text-align: center;
+  background: #0f1f1b;
+}
+
+@media (max-width: 700px) {
+  .pie-redes { top: 66%; flex-wrap: nowrap; gap: 0.5rem; }
+  .pie-red { width: 2.4rem; height: 2.4rem; }
+}

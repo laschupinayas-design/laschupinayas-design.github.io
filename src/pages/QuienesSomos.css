@@ -1,0 +1,153 @@
+/* Página Quiénes somos: mitad foto y mitad texto, con hojas de fondo.
+   Para encuadrar la foto: --qs-foto-pos (ej. 30% 50%) */
+.qs { padding-top: 4rem; background: var(--crema); }
+
+.qs-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 4rem);
+  min-height: calc(100svh - 4rem);
+}
+.qs-invertida .qs-foto { order: 2; }
+
+/* ---- Mitad de foto ---- */
+.qs-foto { position: relative; min-height: 22rem; overflow: hidden; background: var(--cielo); }
+.qs-foto-paisaje, .qs-foto img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.qs-foto img { object-fit: cover; object-position: var(--qs-foto-pos, 50% 40%); }
+
+/* ---- Mitad de texto ---- */
+.qs-texto { position: relative; display: flex; align-items: center; overflow: hidden; background: var(--crema); }
+.qs-texto-in {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 38rem;
+  margin: 0 auto;
+  padding: 4rem clamp(1.5rem, 5vw, 4.5rem);
+}
+
+.qs h1 {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.8rem, 5vw, 4.3rem);
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--verde);
+}
+.qs .qs-divisor { display: block; width: 7rem; height: auto; margin-top: 1rem; color: var(--verde); opacity: 0.65; }
+
+.qs-lead, .qs-parrafo {
+  max-width: 34rem;
+  margin: 1.3rem 0 0;
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--tinta);
+}
+.qs-lead { font-size: clamp(1.4rem, 2.1vw, 1.75rem); }
+.qs-parrafo { font-size: clamp(1.25rem, 1.8vw, 1.45rem); }
+
+.qs-lema {
+  margin: 1.8rem 0 0;
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.5rem, 2.3vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ciruela-vivo);
+}
+.qs-lema em { font-style: italic; }
+
+.qs-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 2rem;
+  padding: 0.95rem 1.7rem;
+  color: #f3ece1;
+  font-family: 'Barlow', system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: var(--verde);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(214, 176, 129, 0.75), 0 6px 14px rgba(18, 52, 42, 0.25);
+  transition: background-color 0.18s ease;
+}
+.qs-cta:hover { background: var(--ciruela-vivo); }
+.qs-cta:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 3px; }
+
+/* ---- Hojas del fondo (imágenes transparentes) ---- */
+.qs-flora { position: absolute; height: auto; pointer-events: none; user-select: none; }
+.qs-flora-panel-der { top: 0; right: 0; width: clamp(6rem, 11vw, 11rem); }
+.qs-flora-panel-izq { bottom: 0; left: 0; width: clamp(5rem, 9vw, 9rem); }
+
+/* ---- Lo que nos une ---- */
+.qs-pilares { position: relative; overflow: hidden; padding: 4.5rem 0 6.5rem; background: var(--hoja); }
+.qs-flora-izq { bottom: 0; left: 0; width: clamp(4.5rem, 9vw, 9.5rem); }
+.qs-flora-der { right: 0; bottom: 0; width: clamp(4rem, 8vw, 8rem); }
+
+.qs-lista {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 9vw, 9rem);
+  list-style: none;
+}
+.qs-pilar { padding: 0.5rem 1.75rem; text-align: center; }
+.qs-pilar + .qs-pilar { border-left: 1px solid var(--line); }
+
+.qs-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  color: #f3ece1;
+  background: var(--verde);
+  border-radius: 50%;
+}
+.qs-pilar-luna .qs-icono { background: var(--ciruela-vivo); }
+.qs-pilar-hoja .qs-icono { background: var(--petroleo); }
+
+.qs-pilar h2 {
+  margin-top: 1.1rem;
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--verde);
+}
+.qs-pilar-luna h2 { color: var(--ciruela-vivo); }
+.qs-pilar .qs-divisor { margin: 0.9rem auto 0; }
+.qs-pilar p {
+  margin: 0.9rem 0 0;
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--tinta);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qs-cta { transition: none; }
+}
+
+/* ---- Pantallas chicas: foto arriba, texto abajo ---- */
+@media (max-width: 800px) {
+  .qs-split { grid-template-columns: 1fr; min-height: 0; }
+  .qs-invertida .qs-foto { order: 0; }
+  .qs-foto { height: 50vw; min-height: 17rem; max-height: 26rem; }
+  .qs-texto-in { padding: 2.5rem 1.5rem 3.5rem; }
+  .qs-flora-panel-der { width: 5rem; }
+  .qs-flora-panel-izq { width: 4.5rem; }
+
+  .qs-pilares { padding: 3rem 0 8rem; }
+  .qs-lista { grid-template-columns: 1fr; padding: 0 1.5rem; }
+  .qs-pilar { padding: 1.75rem 0; }
+  .qs-pilar + .qs-pilar { border-left: 0; border-top: 1px solid var(--line); }
+  .qs-flora-izq { width: 4.5rem; }
+  .qs-flora-der { width: 4rem; }
+}

@@ -1,0 +1,165 @@
+/* Selectores con doble clase para ganarle a App.css sin importar el orden de carga */
+.page-head.page-head-ciruela { background: var(--ciruela); }
+
+.cf-pagina {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 2.5rem;
+  align-items: start;
+  padding-top: 2.5rem;
+  padding-bottom: 3.5rem;
+}
+
+.cf-info h2 { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 2.4rem; color: var(--ciruela-vivo); }
+.cf-info p { margin: 0.75rem 0 0; font-size: 1.2rem; }
+.cf-puntos { margin: 1.5rem 0 0; padding: 0; list-style: none; border-top: 2px solid var(--ink); }
+.cf-puntos li { padding: 0.85rem 0; border-bottom: 1px solid var(--line); font-size: 1.1rem; }
+.cf-info .cf-directo { margin-top: 1.5rem; font-size: 1.05rem; color: var(--muted); }
+.cf-directo a { color: var(--moss); font-weight: 600; }
+
+.cf-card {
+  padding: 1.5rem;
+  background: var(--hoja);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.cf-card h2 { margin: 0 0 1rem; font-size: 1.9rem; color: var(--verde); }
+.cf-card .cta-dark { width: 100%; margin-top: 0.5rem; }
+.cf-ok p { margin: 0 0 1rem; font-size: 1.1rem; }
+
+.cf-campo { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+.cf-campo label { font-weight: 600; font-size: 0.95rem; }
+.cf-card input:not([type='checkbox']),
+.cf-card select,
+.cf-card textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+}
+.cf-card textarea { resize: vertical; }
+.cf-card [aria-invalid='true'] { border-color: #a3261c; }
+.cf-card input:focus-visible,
+.cf-card select:focus-visible,
+.cf-card textarea:focus-visible { outline: 3px solid var(--moss); outline-offset: 2px; }
+.cf-error { margin: 0 0 0.75rem; font-size: 0.92rem; color: #a3261c; }
+.cf-campo .cf-error { margin: 0; }
+
+.cf-telefono { display: grid; grid-template-columns: 7.5rem 1fr; gap: 0.5rem; }
+.cf-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+.cf-trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (max-width: 800px) {
+  .cf-pagina { grid-template-columns: 1fr; gap: 2rem; }
+}
+@media (max-width: 480px) {
+  .cf-fila { grid-template-columns: 1fr; }
+}
+
+/* ---------- Encabezado ---------- */
+.page-head .cf-sobretitulo {
+  margin: 0 0 0.4rem;
+  color: var(--dorado);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ---------- Actividades ---------- */
+.cf-info h3.cf-sub {
+  margin: 1.75rem 0 0.75rem;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 1.4rem;
+  color: var(--verde);
+}
+.act-lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-info .act-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1.1rem 0.75rem 1rem;
+  font: inherit;
+  text-align: center;
+  color: var(--verde);
+  background: linear-gradient(180deg, #f6efe3 0%, #eee3d3 100%);
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cf-info .act-card:hover { transform: translateY(-2px); border-color: var(--petroleo); box-shadow: 0 8px 18px rgba(var(--sombra), 0.14); }
+.cf-info .act-card:focus-visible { outline: 3px solid var(--ciruela-vivo); outline-offset: 3px; }
+.cf-info .act-card-activa { border-color: var(--verde); box-shadow: 0 0 0 2px var(--verde), 0 8px 18px rgba(var(--sombra), 0.18); }
+.act-icono {
+  display: grid;
+  place-items: center;
+  width: 4.6rem;
+  height: 4.6rem;
+  margin-bottom: 0.6rem;
+  color: #f3ece1;
+  background: var(--verde);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #f6efe3, 0 0 0 4.5px var(--dorado);
+  transition: background-color 0.15s ease;
+}
+.cf-info .act-card-activa .act-icono { background: var(--ciruela-vivo); }
+.act-nombre { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 1.35rem; font-weight: 700; line-height: 1.1; }
+.act-texto { margin-top: 0.25rem; color: var(--muted); font-size: 0.92rem; line-height: 1.3; }
+.act-check {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--ciruela-vivo);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.cf-info .act-card-activa .act-check { opacity: 1; transform: none; }
+.cf-info .act-ayuda { margin: 0.6rem 0 0; font-size: 0.95rem; color: var(--muted); }
+
+.cf-info .cf-puntos { margin-top: 1.75rem; }
+.cf-puntos li { position: relative; padding-left: 1.6rem; }
+.cf-puntos li::before { content: '✿'; position: absolute; left: 0; color: var(--terracota); }
+
+/* ---------- Formulario ---------- */
+.cf-card { box-shadow: 0 12px 28px rgba(var(--sombra), 0.12); }
+.cf-card h2 { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 2rem; }
+.cf-card .act-resumen {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.1rem;
+  padding: 0.7rem 0.9rem;
+  color: var(--petroleo);
+  font-weight: 600;
+  background: var(--arena);
+  border-radius: 12px;
+}
+.act-resumen-iconos { display: inline-flex; gap: 0.4rem; color: var(--verde); }
+
+@media (max-width: 480px) {
+  .act-lista { gap: 0.6rem; }
+  .act-icono { width: 4rem; height: 4rem; }
+}
