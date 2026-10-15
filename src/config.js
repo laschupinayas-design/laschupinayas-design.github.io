@@ -26,7 +26,7 @@ export const grupo = {
 
   eventosPrivados: {
     texto:
-      'Organizamos una salida solo para tu grupo: amigos, familia o equipo de trabajo. Elegimos contigo la ruta, el nivel y el horario.',
+      '',
     puntos: [
       'Ruta y nivel a la medida del grupo',
       'Fecha y horario a tu elección',

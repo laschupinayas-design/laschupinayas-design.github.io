@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { grupo } from '../config';
 import { modoDemo } from '../lib/eventos';
 import { crearSolicitudPrivada } from '../lib/solicitudes';
-import IconoActividad from '../components/IconoActividad';
+import { SERVICIOS } from '../data/servicios';
 import './EventosPrivados.css';
 
 const PAISES = [
@@ -15,14 +15,6 @@ const PAISES = [
   ['+51', 'PE +51'],
 ];
 
-// Actividades que se pueden pedir para un evento privado.
-const ACTIVIDADES = [
-  { clave: 'senderismo', nombre: 'Senderismo', texto: 'Rutas a tu nivel y a tu ritmo' },
-  { clave: 'bici', nombre: 'Bici de montaña', texto: 'Senderos y brechas en grupo' },
-  { clave: 'yoga', nombre: 'Yoga', texto: 'Práctica al aire libre' },
-  { clave: 'camping', nombre: 'Campamento', texto: 'Una noche entre árboles' },
-];
-
 const VACIO = {
   nombre: '',
   email: '',
@@ -30,6 +22,7 @@ const VACIO = {
   tel: '',
   personas: '',
   fecha: '',
+  servicio: '',
   mensaje: '',
   website: '', // campo trampa para bots
 };
@@ -71,14 +64,18 @@ export default function EventosPrivados() {
   const [errorEnvio, setErrorEnvio] = useState('');
   const [enviado, setEnviado] = useState(false);
   const [demo, setDemo] = useState(false);
-  const [actividades, setActividades] = useState([]);
 
   const hoyISO = new Date().toLocaleDateString('en-CA');
   const contacto = grupo.whatsapp || (grupo.email ? `mailto:${grupo.email}` : '');
 
-  const alternar = (clave) =>
-    setActividades((a) => (a.includes(clave) ? a.filter((x) => x !== clave) : [...a, clave]));
-  const nombresElegidas = ACTIVIDADES.filter((a) => actividades.includes(a.clave)).map((a) => a.nombre);
+  const servicioElegido = SERVICIOS.find((x) => x.clave === v.servicio);
+
+  const pedirServicio = (clave) => {
+    setV((a) => ({ ...a, servicio: clave }));
+    const campoServicio = document.getElementById('cf-servicio');
+    campoServicio?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    campoServicio?.focus({ preventScroll: true });
+  };
 
   const cambiar = (e) => setV((a) => ({ ...a, [e.target.name]: e.target.value }));
 
@@ -114,11 +111,10 @@ export default function EventosPrivados() {
         phone: v.tel.trim() ? soloDigitos(v.tel) : null,
         group_size: v.personas ? Number(v.personas) : null,
         desired_date: v.fecha || null,
-        message: (nombresElegidas.length ? `Actividades: ${nombresElegidas.join(', ')}\n\n` : '') + v.mensaje.trim(),
+        message: (servicioElegido ? `Actividad: ${servicioElegido.titulo}\n\n` : '') + v.mensaje.trim(),
       });
       setDemo(res.demo);
       setV(VACIO);
-      setActividades([]);
       setEnviado(true);
     } catch (err) {
       setErrorEnvio(err.message);
@@ -141,29 +137,6 @@ export default function EventosPrivados() {
         <section className="cf-info" aria-labelledby="cf-titulo-info">
           <h2 id="cf-titulo-info">Una salida a tu medida</h2>
           <p>{grupo.eventosPrivados.texto}</p>
-
-          <h3 className="cf-sub">¿Qué quieren hacer?</h3>
-          <ul className="act-lista">
-            {ACTIVIDADES.map((a) => {
-              const activa = actividades.includes(a.clave);
-              return (
-                <li key={a.clave}>
-                  <button
-                    type="button"
-                    className={`act-card${activa ? ' act-card-activa' : ''}`}
-                    aria-pressed={activa}
-                    onClick={() => alternar(a.clave)}
-                  >
-                    <span className="act-icono"><IconoActividad clave={a.clave} size={56} /></span>
-                    <span className="act-nombre">{a.nombre}</span>
-                    <span className="act-texto">{a.texto}</span>
-                    <span className="act-check" aria-hidden="true">✓</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="act-ayuda">Toca las que te interesen; puedes elegir varias.</p>
 
           <ul className="cf-puntos">
             {grupo.eventosPrivados.puntos.map((p) => (
@@ -200,21 +173,6 @@ export default function EventosPrivados() {
                 <p className="aviso">Modo demostración: Supabase no está configurado, así que la solicitud no se guardará.</p>
               )}
 
-              <p className="act-resumen">
-                {nombresElegidas.length > 0 ? (
-                  <>
-                    <span className="act-resumen-iconos">
-                      {ACTIVIDADES.filter((a) => actividades.includes(a.clave)).map((a) => (
-                        <IconoActividad key={a.clave} clave={a.clave} size={26} />
-                      ))}
-                    </span>
-                    <span>{nombresElegidas.join(' · ')}</span>
-                  </>
-                ) : (
-                  <span>Elige una o varias actividades en las tarjetas (opcional).</span>
-                )}
-              </p>
-
               <Campo id="cf-nombre" label="Nombre completo" error={errores.nombre}>
                 <input {...campo('nombre')} autoComplete="name" placeholder="Ej. Ana Torres" />
               </Campo>
@@ -243,6 +201,15 @@ export default function EventosPrivados() {
                 </Campo>
               </div>
 
+              <Campo id="cf-servicio" label="Tipo de actividad (opcional)">
+                <select id="cf-servicio" name="servicio" value={v.servicio} onChange={cambiar}>
+                  <option value="">Elige una opción</option>
+                  {SERVICIOS.map((sv) => (
+                    <option key={sv.clave} value={sv.clave}>{sv.titulo}</option>
+                  ))}
+                </select>
+              </Campo>
+
               <Campo id="cf-mensaje" label="¿Qué tienes en mente?" error={errores.mensaje}>
                 <textarea {...campo('mensaje')} rows="5" maxLength={1900} placeholder="Cuéntanos qué celebran, qué nivel de caminata buscan y cualquier detalle que nos ayude." />
               </Campo>
@@ -261,6 +228,40 @@ export default function EventosPrivados() {
           )}
         </section>
       </div>
+
+      <section className="wrap srv-seccion" aria-labelledby="srv-titulo">
+        <h2 id="srv-titulo">Servicios para tu grupo</h2>
+        <p className="srv-intro">Conoce lo que podemos organizar. Abre cada uno para ver las opciones.</p>
+          <div className="srv-lista">
+            {SERVICIOS.map((sv, i) => (
+              <details className="srv-item" key={sv.clave}>
+                <summary>
+                  <span className="srv-num" aria-hidden="true">{i + 1}</span>
+                  <span className="srv-titulos">
+                    <span className="srv-titulo">{sv.titulo}</span>
+                    <span className="srv-lema">{sv.lema}</span>
+                  </span>
+                  <span className="srv-mas" aria-hidden="true" />
+                </summary>
+                <div className="srv-cuerpo">
+                  {sv.items ? (
+                    <ul>
+                      {sv.items.map((it) => <li key={it}>{it}</li>)}
+                    </ul>
+                  ) : (
+                    <>
+                      <p className="srv-detalle">{sv.detalle}</p>
+                      <p>{sv.descripcion}</p>
+                    </>
+                  )}
+                  <button type="button" className="srv-pedir" onClick={() => pedirServicio(sv.clave)}>
+                    Pedir esta experiencia <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+              </details>
+            ))}
+          </div>
+      </section>
     </main>
   );
 }
