@@ -65,3 +65,61 @@
   .adm-grid { grid-template-columns: 1fr; }
   .adm-pagina .adm-form { padding: 1.1rem; }
 }
+
+/* Pestañas del panel */
+.adm-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+.adm-pagina .adm-tab {
+  padding: 0.7rem 1.3rem; margin-bottom: -1px; font: inherit; font-size: 1.05rem; font-weight: 600; color: var(--muted);
+  background: transparent; border: 1px solid transparent; border-radius: 12px 12px 0 0; cursor: pointer;
+}
+.adm-pagina .adm-tab:hover { color: var(--verde); }
+.adm-pagina .adm-tab-activa { color: var(--ciruela-vivo); background: var(--hoja); border-color: var(--line); border-bottom-color: var(--hoja); }
+.adm-pagina .adm-tab:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 2px; }
+.adm-pagina .adm-intro { margin: 0 0 1rem; font-size: 1.1rem; color: var(--muted); }
+
+/* Reservaciones */
+.adm-pagina .rs-volver { margin-bottom: 1rem; }
+.adm-pagina .rs-titulo { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 2rem; color: var(--ciruela-vivo); }
+.rs-cifras { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0 1.25rem; padding: 0; list-style: none; }
+.rs-cifras li { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.6rem 1rem; background: var(--hoja); border: 1px solid var(--line); border-radius: 12px; }
+.rs-cifras strong { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 1.8rem; color: var(--verde); }
+.rs-cifras span { color: var(--muted); font-size: 0.95rem; }
+
+.rs-tabla-wrap { overflow-x: auto; background: var(--hoja); border: 1px solid var(--line); border-radius: 14px; }
+.rs-tabla { width: 100%; min-width: 52rem; border-collapse: collapse; font-size: 0.98rem; }
+.rs-tabla th { padding: 0.75rem 0.9rem; text-align: left; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--arena); border-bottom: 1px solid var(--line); }
+.rs-tabla td { padding: 0.75rem 0.9rem; vertical-align: middle; border-bottom: 1px solid var(--line); }
+.rs-tabla tbody tr:last-child td { border-bottom: 0; }
+.rs-tabla .rs-num { text-align: center; }
+.rs-tabla .rs-acciones { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.rs-fila-cancelada td { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(var(--sombra), 0.3); }
+.rs-fila-cancelada td:nth-child(6), .rs-fila-cancelada td:nth-child(7) { text-decoration: none; }
+.rs-fila-detalle td { background: var(--lila, #f1e7f0); }
+
+.rs-estado { display: inline-block; padding: 0.2rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; }
+.rs-pendiente { background: #f7ead0; color: #7a5410; }
+.rs-autorizado { background: var(--menta-2, #c9dccf); color: var(--verde); }
+.rs-cancelada { background: #eadad7; color: #8a2a1c; }
+
+.adm-pagina .rs-autorizar {
+  display: inline-block; padding: 0.45rem 0.95rem; border: 0; border-radius: 999px; font: inherit; font-size: 0.95rem; font-weight: 600;
+  background: var(--verde); color: #f3ece1; cursor: pointer;
+}
+.adm-pagina .rs-autorizar:hover { background: var(--ciruela-vivo); }
+.adm-pagina .rs-autorizar:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 2px; }
+
+.rs-detalle { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.75rem 1.5rem; margin: 0; }
+.rs-detalle dt { font-size: 0.82rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.rs-detalle dd { margin: 0.15rem 0 0; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .rs-tabla { min-width: 0; }
+  .rs-tabla thead { display: none; }
+  .rs-tabla, .rs-tabla tbody, .rs-tabla tr, .rs-tabla td { display: block; width: 100%; }
+  .rs-tabla tr { padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+  .rs-tabla td { display: flex; justify-content: space-between; gap: 1rem; padding: 0.35rem 0.9rem; border: 0; text-align: right; }
+  .rs-tabla td::before { content: attr(data-label); font-weight: 600; color: var(--muted); text-align: left; }
+  .rs-tabla .rs-acciones { justify-content: flex-end; }
+  .rs-fila-detalle td { display: block; text-align: left; }
+  .rs-fila-detalle td::before { content: none; }
+}

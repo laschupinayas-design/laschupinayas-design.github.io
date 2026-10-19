@@ -32,3 +32,28 @@ export async function eliminarEvento(id) {
   const { error } = await supabase.from('events').delete().eq('id', id);
   if (error) throw new Error(mensaje(error));
 }
+
+// ---------- Reservaciones ----------
+
+// Resumen para la lista de eventos: una fila por reserva (solo lo necesario para contar).
+export async function resumenReservas() {
+  const { data, error } = await supabase.from('reservations').select('event_id, status, spots');
+  if (error) throw new Error(mensaje(error));
+  return data;
+}
+
+export async function listarReservas(eventId) {
+  const { data, error } = await supabase
+    .from('reservations')
+    .select('*')
+    .eq('event_id', eventId)
+    .order('created_at', { ascending: true });
+  if (error) throw new Error(mensaje(error));
+  return data;
+}
+
+// status: 'pendiente' o 'confirmada' (autorizado)
+export async function cambiarEstadoReserva(id, status) {
+  const { error } = await supabase.from('reservations').update({ status }).eq('id', id);
+  if (error) throw new Error(mensaje(error));
+}

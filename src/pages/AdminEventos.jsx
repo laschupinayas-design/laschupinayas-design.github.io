@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { authDisponible, useAuth } from '../lib/auth';
 import { actualizarEvento, crearEvento, eliminarEvento, listarEventosAdmin } from '../lib/admin';
 import { audienciaTexto, fechaLarga, hora, precioTexto, TIPOS } from '../lib/formato';
+import AdminReservaciones from './AdminReservaciones';
 import './AdminEventos.css';
 
 const VACIO = {
@@ -293,6 +294,7 @@ export default function AdminEventos() {
   const [eventos, setEventos] = useState(null);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
+  const [pestana, setPestana] = useState('eventos'); // eventos | reservas
   const [vista, setVista] = useState({ modo: 'lista' }); // lista | form
   const [confirmando, setConfirmando] = useState(null);
   const [ocupado, setOcupado] = useState(null);
@@ -427,11 +429,23 @@ export default function AdminEventos() {
     <main>
       <header className="page-head">
         <div className="wrap">
-          <h1>Registrar evento</h1>
-          <p>Crea, edita y publica los eventos del sitio.</p>
+          <h1>Panel de administración</h1>
+          <p>Crea eventos y revisa las reservaciones.</p>
         </div>
       </header>
-      <div className="wrap adm-pagina">{cuerpo}</div>
+      <div className="wrap adm-pagina">
+        {authDisponible && esAdmin && (
+          <div className="adm-tabs" role="tablist" aria-label="Secciones del panel">
+            <button type="button" role="tab" aria-selected={pestana === 'eventos'} className={`adm-tab${pestana === 'eventos' ? ' adm-tab-activa' : ''}`} onClick={() => setPestana('eventos')}>
+              Eventos
+            </button>
+            <button type="button" role="tab" aria-selected={pestana === 'reservas'} className={`adm-tab${pestana === 'reservas' ? ' adm-tab-activa' : ''}`} onClick={() => setPestana('reservas')}>
+              Reservaciones
+            </button>
+          </div>
+        )}
+        {esAdmin && pestana === 'reservas' ? <AdminReservaciones /> : cuerpo}
+      </div>
     </main>
   );
 }

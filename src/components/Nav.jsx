@@ -91,7 +91,7 @@ export default function Nav() {
             ))}
             {esAdmin && (
               <li className="nav-item">
-                <Link to="/admin/eventos">Registrar evento</Link>
+                <Link to="/admin/eventos">Administración</Link>
               </li>
             )}
             {authDisponible &&
