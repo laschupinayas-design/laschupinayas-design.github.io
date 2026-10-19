@@ -3,7 +3,7 @@ import { supabase } from '../supabase/supabaseClient';
 
 export const authDisponible = Boolean(supabase);
 
-const AuthContext = createContext({ usuario: null, cargando: false });
+const AuthContext = createContext({ usuario: null, cargando: false, esAdmin: false });
 export const useAuth = () => useContext(AuthContext);
 
 // Dirección a la que regresan Google y los correos de confirmación (sin el #).
@@ -12,6 +12,7 @@ const urlRetorno = () => `${window.location.origin}${window.location.pathname}`;
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
   const [cargando, setCargando] = useState(authDisponible);
+  const [esAdmin, setEsAdmin] = useState(false);
 
   useEffect(() => {
     if (!supabase) return undefined;
@@ -25,7 +26,26 @@ export function AuthProvider({ children }) {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  return <AuthContext.Provider value={{ usuario, cargando }}>{children}</AuthContext.Provider>;
+  // Revisa si quien inició sesión está en la tabla "admins" (ver sql/admin_eventos.sql).
+  const idUsuario = usuario?.id;
+  useEffect(() => {
+    let vivo = true;
+    if (!supabase || !idUsuario) {
+      setEsAdmin(false);
+      return undefined;
+    }
+    supabase
+      .from('admins')
+      .select('user_id')
+      .eq('user_id', idUsuario)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (vivo) setEsAdmin(!error && Boolean(data));
+      });
+    return () => { vivo = false; };
+  }, [idUsuario]);
+
+  return <AuthContext.Provider value={{ usuario, cargando, esAdmin }}>{children}</AuthContext.Provider>;
 }
 
 export const nombreUsuario = (u) =>

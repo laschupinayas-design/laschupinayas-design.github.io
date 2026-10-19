@@ -16,7 +16,7 @@ export default function Nav() {
   const [abierto, setAbierto] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loginAbierto, setLoginAbierto] = useState(false);
-  const { usuario } = useAuth();
+  const { usuario, esAdmin } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const enHome = pathname === '/';
@@ -89,6 +89,11 @@ export default function Nav() {
                 )}
               </li>
             ))}
+            {esAdmin && (
+              <li className="nav-item">
+                <Link to="/admin/eventos">Registrar evento</Link>
+              </li>
+            )}
             {authDisponible &&
               (usuario ? (
                 <>

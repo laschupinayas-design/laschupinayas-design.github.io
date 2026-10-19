@@ -1,0 +1,67 @@
+/* Administración de eventos. Prefijo adm- para no chocar con App.css */
+.adm-pagina { padding-top: 2rem; padding-bottom: 3.5rem; max-width: 62rem; }
+
+.adm-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.adm-barra p { margin: 0; font-size: 1.1rem; color: var(--muted); }
+
+.adm-ok {
+  margin: 0 0 1rem; padding: 0.7rem 1rem; border-radius: 12px;
+  background: var(--menta, #e5efe8); color: var(--verde); font-weight: 600;
+}
+.adm-pagina .adm-error { margin: 0.35rem 0 0; color: #a5301f; font-size: 0.95rem; font-weight: 600; }
+
+/* Lista */
+.adm-lista { display: grid; gap: 0.7rem; margin: 0; padding: 0; list-style: none; }
+.adm-pagina .adm-item {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.25rem;
+  padding: 0.9rem 1.1rem; background: var(--hoja); border: 1px solid var(--line); border-radius: 14px;
+}
+.adm-pagina .adm-item.adm-borrador { background: var(--arena); border-style: dashed; }
+.adm-info { flex: 1; min-width: 14rem; }
+.adm-pagina .adm-titulo { margin: 0; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 1.4rem; font-weight: 700; line-height: 1.15; }
+.adm-pagina .adm-meta { margin: 0.2rem 0 0; color: var(--muted); font-size: 0.95rem; }
+.adm-badge {
+  margin-left: 0.6rem; padding: 0.1rem 0.6rem; border-radius: 999px; vertical-align: middle;
+  background: var(--lila-2, #dfcbdc); color: var(--ciruela-vivo); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
+}
+.adm-botones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.adm-pregunta { font-weight: 600; }
+
+.adm-pagina .adm-sec, .adm-pagina .adm-peligro, .adm-pagina .adm-peligro-suave {
+  display: inline-block; padding: 0.45rem 0.95rem; border-radius: 999px; font: inherit; font-size: 0.95rem; font-weight: 600;
+  text-decoration: none; cursor: pointer; border: 1px solid var(--line); background: var(--blanco, #fffdfb); color: var(--ink);
+}
+.adm-pagina .adm-sec:hover { border-color: var(--verde); background: var(--menta, #e5efe8); }
+.adm-pagina .adm-peligro-suave { color: #a5301f; }
+.adm-pagina .adm-peligro-suave:hover { background: #f8e3df; border-color: #a5301f; }
+.adm-pagina .adm-peligro { background: #a5301f; border-color: #a5301f; color: #fff; }
+.adm-pagina button:disabled { opacity: 0.55; cursor: not-allowed; }
+.adm-pagina .adm-sec:focus-visible, .adm-pagina .adm-peligro:focus-visible, .adm-pagina .adm-peligro-suave:focus-visible {
+  outline: 3px solid var(--petroleo); outline-offset: 2px;
+}
+
+/* Formulario */
+.adm-pagina .adm-form { padding: 1.5rem; background: var(--hoja); border: 1px solid var(--line); border-radius: 16px; }
+.adm-pagina .adm-form h2 { margin: 0 0 1.25rem; font-size: 1.9rem; color: var(--verde); }
+.adm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.25rem; }
+.adm-campo { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; min-width: 0; }
+.adm-campo.adm-ancho, .adm-check.adm-ancho { grid-column: 1 / -1; }
+.adm-campo label { font-weight: 600; font-size: 0.98rem; }
+.adm-form input:not([type='checkbox']), .adm-form select, .adm-form textarea {
+  width: 100%; padding: 0.7rem 0.85rem; font: inherit; font-size: 1.02rem; color: var(--ink);
+  background: var(--blanco, #fffdfb); border: 1px solid var(--line); border-radius: 10px;
+}
+.adm-form textarea { resize: vertical; }
+.adm-form input:focus-visible, .adm-form select:focus-visible, .adm-form textarea:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 2px; }
+.adm-form [aria-invalid='true'] { border-color: #a5301f; }
+.adm-form input:disabled { background: var(--arena); color: var(--muted); }
+.adm-pagina .adm-ayuda { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.adm-check { display: flex; align-items: center; gap: 0.6rem; margin: 0.25rem 0 1rem; font-weight: 600; cursor: pointer; }
+.adm-check input { width: 1.2rem; height: 1.2rem; accent-color: var(--verde); }
+.adm-acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
+.adm-pagina .adm-acciones .cta { min-width: 11rem; }
+
+@media (max-width: 640px) {
+  .adm-grid { grid-template-columns: 1fr; }
+  .adm-pagina .adm-form { padding: 1.1rem; }
+}
