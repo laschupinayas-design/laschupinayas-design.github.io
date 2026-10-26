@@ -1,0 +1,66 @@
+/* Formulario de reseñas. Prefijo rsn- para no chocar con App.css */
+.rsn-pagina { max-width: 44rem; padding-top: 2.5rem; padding-bottom: 4rem; }
+.rsn-pagina .rsn-card {
+  padding: 1.75rem; background: var(--hoja); border: 1px solid var(--line); border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(var(--sombra), 0.08);
+}
+
+.rsn-campo { display: flex; flex-direction: column; gap: 0.4rem; margin: 0 0 1.4rem; padding: 0; border: 0; min-width: 0; }
+.rsn-campo > label, .rsn-campo > legend { padding: 0; font-weight: 700; font-size: 1.08rem; color: var(--verde); }
+.rsn-opc { font-weight: 500; color: var(--muted); }
+.rsn-pagina .rsn-ayuda { margin: 0; font-size: 0.92rem; color: var(--muted); }
+.rsn-form input:not([type='checkbox']):not([type='radio']), .rsn-form select, .rsn-form textarea {
+  width: 100%; padding: 0.75rem 0.9rem; font: inherit; font-size: 1.05rem; color: var(--ink);
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+}
+.rsn-form textarea { resize: vertical; }
+.rsn-form input:focus-visible, .rsn-form select:focus-visible, .rsn-form textarea:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 2px; }
+.rsn-form [aria-invalid='true'] { border-color: #a5301f; }
+.rsn-pagina .rsn-error { margin: 0.2rem 0 0; color: #a5301f; font-size: 0.95rem; font-weight: 600; }
+.rsn-pagina .rsn-error-envio { padding: 0.7rem 0.9rem; border-radius: 10px; background: #f8e3df; }
+
+/* Estrellas */
+.rsn-fila-estrellas { display: flex; align-items: center; gap: 0.15rem; margin-top: 0.3rem; }
+.rsn-estrella, .rsn-cero { position: relative; display: grid; place-items: center; cursor: pointer; }
+.rsn-estrella { color: var(--dorado); padding: 0.1rem; transition: transform 0.12s; }
+.rsn-estrella:hover { transform: scale(1.12); }
+.rsn-llena { color: var(--terracota, #bb6e48); }
+.rsn-cero {
+  width: 2.1rem; height: 2.1rem; margin-right: 0.5rem; border: 1px solid var(--line); border-radius: 50%;
+  font-weight: 700; color: var(--muted); background: #fff;
+}
+.rsn-cero-activo { background: var(--ciruela-vivo); border-color: var(--ciruela-vivo); color: #fff; }
+.rsn-estrella input, .rsn-cero input, .rsn-opcion input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.rsn-estrella:has(input:focus-visible), .rsn-cero:has(input:focus-visible), .rsn-opcion:has(input:focus-visible) {
+  outline: 3px solid var(--petroleo); outline-offset: 2px; border-radius: 10px;
+}
+.rsn-pagina .rsn-frase { margin: 0.1rem 0 0; min-height: 1.6em; font-family: 'DM Serif Display', Georgia, serif; font-size: 1.5rem; color: var(--ciruela-vivo); }
+
+/* Recomendarías */
+.rsn-opciones { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.2rem; }
+.rsn-opcion {
+  position: relative; padding: 0.65rem 1.2rem; border: 1px solid var(--line); border-radius: 999px;
+  background: #fff; font-weight: 600; cursor: pointer;
+}
+.rsn-opcion:hover { border-color: var(--verde); }
+.rsn-opcion-activa { background: var(--verde); border-color: var(--verde); color: #f3ece1; }
+
+/* Autorización */
+.rsn-autoriza { display: flex; align-items: flex-start; gap: 0.7rem; margin-top: 0.4rem; font-weight: 600; cursor: pointer; }
+.rsn-autoriza input { flex: none; width: 1.3rem; height: 1.3rem; margin-top: 0.15rem; accent-color: var(--verde); }
+.rsn-pagina .rsn-nota { margin: 0.6rem 0 1.4rem; }
+
+.rsn-pagina .rsn-enviar { width: 100%; }
+.rsn-trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* Gracias */
+.rsn-ok h2 { margin: 0 0 0.6rem; font-size: 2rem; color: var(--verde); }
+.rsn-ok p { font-size: 1.15rem; }
+.rsn-acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+.rsn-pagina .rsn-sec { padding: 0.8rem 1.4rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.rsn-pagina .rsn-sec:hover { border-color: var(--verde); background: var(--menta, #e5efe8); }
+
+@media (max-width: 520px) {
+  .rsn-pagina .rsn-card { padding: 1.2rem; }
+  .rsn-estrella svg { width: 34px; height: 34px; }
+}

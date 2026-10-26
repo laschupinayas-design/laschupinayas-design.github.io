@@ -139,3 +139,29 @@
 .rv-fila.rv-fila-destacada { grid-template-columns: 1fr; gap: 0.15rem; }
 .rv-fila-destacada .rv-valor { font-size: 1.2rem; letter-spacing: 0.06em; word-break: break-all; }
 @media (max-width: 520px) { .rv-cabecera { align-items: flex-start; } }
+
+/* ---------- Pago con tarjeta (Openpay) ---------- */
+.rv-aviso { margin: 0 0 1rem; padding: 0.75rem 1rem; border-radius: 12px; background: var(--lila, #f1e7f0); color: var(--ciruela-vivo); font-weight: 600; }
+.rv .rv-aviso-error { background: #f8e3df; color: #8a2a1c; }
+
+.rv-metodos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; padding: 0.3rem; margin-bottom: 1.1rem; background: rgba(var(--sombra), 0.07); border-radius: 999px; }
+.rv .rv-metodo { padding: 0.6rem 1rem; border: 0; border-radius: 999px; background: transparent; font: inherit; font-size: 1rem; font-weight: 700; color: var(--muted); cursor: pointer; }
+.rv .rv-metodo-activo { background: var(--verde); color: #f3ece1; box-shadow: 0 4px 10px rgba(var(--sombra), 0.18); }
+.rv .rv-metodo:focus-visible { outline: 3px solid var(--ciruela-vivo); outline-offset: 2px; }
+.rv .rv-nota-metodo { margin: 0; font-size: 1.02rem; color: var(--muted); }
+
+.rv-tarjeta { display: grid; gap: 0.2rem; }
+.rv-campo { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.8rem; min-width: 0; }
+.rv-campo label { font-weight: 600; font-size: 0.95rem; }
+.rv-campo input {
+  width: 100%; padding: 0.75rem 0.9rem; font: inherit; font-size: 1.08rem; letter-spacing: 0.02em; color: var(--ink);
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+}
+.rv-campo input:focus-visible { outline: 3px solid var(--petroleo); outline-offset: 2px; }
+.rv-campo input[aria-invalid='true'] { border-color: #a5301f; }
+.rv-fila-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+.rv .rv-error { margin: 0; color: #a5301f; font-size: 0.92rem; font-weight: 600; }
+.rv .rv-error-envio { padding: 0.65rem 0.9rem; border-radius: 10px; background: #f8e3df; margin-bottom: 0.6rem; }
+.rv .rv-pagar { width: 100%; border: 0; cursor: pointer; font: inherit; font-weight: 700; }
+.rv .rv-pagar:disabled { opacity: 0.6; cursor: wait; }
+.rv .rv-seguro { margin: 0.7rem 0 0; font-size: 0.88rem; color: var(--muted); text-align: center; }

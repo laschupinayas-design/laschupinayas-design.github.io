@@ -9,6 +9,7 @@ import Reserva from './pages/Reserva';
 import EventosPrivados from './pages/EventosPrivados';
 import QuienesSomos from './pages/QuienesSomos';
 import AdminEventos from './pages/AdminEventos';
+import Resenas from './pages/Resenas';
 
 // Al cambiar de página, vuelve arriba (salvo que se pida bajar a una sección de la home).
 function ScrollToTop() {
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/eventos-privados" element={<EventosPrivados />} />
         <Route path="/quienes-somos" element={<QuienesSomos />} />
         <Route path="/admin/eventos" element={<AdminEventos />} />
+        <Route path="/resenas" element={<Resenas />} />
         <Route path="*" element={<NoEncontrada />} />
       </Routes>
       <Footer />
